@@ -24,6 +24,7 @@ def main(args):
     dist.init_process_group(backend='gloo', init_method='env://')
     local_rank = args.local_rank
     #torch.cuda.set_device(local_rank)
+    torch.cpu.set_device()
     rank = dist.get_rank()
     world_size = dist.get_world_size()
 
@@ -113,7 +114,7 @@ def main(args):
             global_step += 1
             if (global_step < 300):
               backbone_quant = unfreeze_model(backbone_quant)
-            img = img.cuda(local_rank, non_blocking=True)
+            img = img.cpu(local_rank, non_blocking=True)
 
             features = F.normalize(backbone_quant(img))
             with torch.no_grad():

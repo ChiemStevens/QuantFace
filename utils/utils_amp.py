@@ -2,7 +2,7 @@ from typing import Dict, List
 
 import torch
 from torch._six import container_abcs
-from torch.cuda.amp import GradScaler
+from torch.cpu.amp import GradScaler
 
 
 class _MultiDeviceReplicator(object):
@@ -11,7 +11,7 @@ class _MultiDeviceReplicator(object):
     """
 
     def __init__(self, master_tensor: torch.Tensor) -> None:
-        assert master_tensor.is_cuda
+        assert master_tensor.is_cpu
         self.master = master_tensor
         self._per_device_tensors: Dict[torch.device, torch.Tensor] = {}
 
@@ -52,7 +52,7 @@ class MaxClipGradScaler(GradScaler):
         self.scale_clip()
         # Short-circuit for the common case.
         if isinstance(outputs, torch.Tensor):
-            assert outputs.is_cuda
+            assert outputs.is_cpu
             if self._scale is None:
                 self._lazy_init_scale_growth_tracker(outputs.device)
             assert self._scale is not None
@@ -63,7 +63,7 @@ class MaxClipGradScaler(GradScaler):
 
         def apply_scale(val):
             if isinstance(val, torch.Tensor):
-                assert val.is_cuda
+                assert val.is_cpu
                 if len(stash) == 0:
                     if self._scale is None:
                         self._lazy_init_scale_growth_tracker(val.device)

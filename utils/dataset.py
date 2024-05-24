@@ -23,7 +23,7 @@ class BackgroundGenerator(threading.Thread):
         self.start()
 
     def run(self):
-        torch.cuda.set_device(self.local_rank)
+        torch.cpu.set_device(self.local_rank)
         for item in self.generator:
             self.queue.put(item)
         self.queue.put(None)
@@ -44,7 +44,7 @@ class BackgroundGenerator(threading.Thread):
 class DataLoaderX(DataLoader):
     def __init__(self, local_rank, **kwargs):
         super(DataLoaderX, self).__init__(**kwargs)
-        self.stream = torch.cuda.Stream(local_rank)
+        self.stream = torch.cpu.Stream(local_rank)
         self.local_rank = local_rank
 
     def __iter__(self):
@@ -57,13 +57,13 @@ class DataLoaderX(DataLoader):
         self.batch = next(self.iter, None)
         if self.batch is None:
             return None
-        with torch.cuda.stream(self.stream):
+        with torch.cpu.stream(self.stream):
             for k in range(len(self.batch)):
                 self.batch[k] = self.batch[k].to(device=self.local_rank,
                                                  non_blocking=True)
 
     def __next__(self):
-        torch.cuda.current_stream().wait_stream(self.stream)
+        torch.cpu.current_stream().wait_stream(self.stream)
         batch = self.batch
         if batch is None:
             raise StopIteration

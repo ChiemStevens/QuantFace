@@ -21,9 +21,10 @@ from backbones.iresnet import iresnet100, iresnet50, freeze_model, unfreeze_mode
 torch.backends.cudnn.benchmark = True
 
 def main(args):
-    dist.init_process_group(backend='nccl', init_method='env://')
+    dist.init_process_group(backend='gloo', init_method='env://')
     local_rank = args.local_rank
-    torch.cuda.set_device(local_rank)
+    # torch.cuda.set_device(torch.device("cuda" if torch.cuda.is_available() else "cpu"))
+    # torch.cuda.set_device(local_rank)
     rank = dist.get_rank()
     world_size = dist.get_world_size()
 
@@ -142,8 +143,13 @@ def main(args):
 
 
 if __name__ == "__main__":
+    # os.environ['MASTER_ADDR'] = '127.0.0.1'
+    # os.environ['MASTER_PORT'] = '1255'
+    # # os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+    # dist.init_process_group(backend="nccl", init_method='env://', rank = torch.cuda.device_count(), world_size = 1)
     parser = argparse.ArgumentParser(description='PyTorch margin penalty loss  training')
     parser.add_argument('--local_rank', type=int, default=0, help='local_rank')
     parser.add_argument('--resume', type=int, default=1, help="resume training")
     args_ = parser.parse_args()
     main(args_)
+    # print(torch.cuda.is_available())

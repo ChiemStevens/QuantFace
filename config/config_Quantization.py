@@ -30,7 +30,7 @@ if (config.network == "mobilefacenet"):
 
 
 if config.dataset == "emoreIresNetTunning":
-    config.rec = "/data/fboutros/faces_emore"
+    config.rec = "./data/faces_emore/"
     config.num_classes = 85742
     config.num_image = 5811200
     config.num_epoch =  1

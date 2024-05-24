@@ -25,7 +25,8 @@ def main(args):
     local_rank = args.local_rank
     #torch.cuda.set_device(local_rank)
     #torch.cpu.set_device()
-    torch.get_default_device()
+    #torch.get_default_device()
+    torch.cpu.set_device()
     rank = dist.get_rank()
     world_size = dist.get_world_size()
 

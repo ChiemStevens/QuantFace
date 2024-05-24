@@ -23,8 +23,8 @@ class BackgroundGenerator(threading.Thread):
         self.start()
 
     def run(self):
-        #torch.cpu.set_device(self.local_rank)
-        torch.get_default_device()
+        torch.cpu.set_device()
+        #torch.get_default_device()
         for item in self.generator:
             self.queue.put(item)
         self.queue.put(None)
